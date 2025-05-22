@@ -2,13 +2,12 @@ package cose457.drawingtool.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@AllArgsConstructor
-public class RectangleShape {
+public class RectangleShape extends ShapeModel {
 
-    private double x;
-    private double y;
-    private double width;
-    private double height;
+    public RectangleShape(double x, double y, double width, double height, int zOrder) {
+        super(x, y, width, height, zOrder);
+    }
 }

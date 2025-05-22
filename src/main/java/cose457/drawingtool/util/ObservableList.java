@@ -19,6 +19,12 @@ public class ObservableList<T> {
         notifyListeners();
     }
 
+    public void setAll(List<T> newItems) {
+        list.clear();
+        list.addAll(newItems);
+        notifyListeners();
+    }
+
     public List<T> get() {
         return Collections.unmodifiableList(list);
     }
