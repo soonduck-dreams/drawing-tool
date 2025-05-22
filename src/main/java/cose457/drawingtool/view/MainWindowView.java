@@ -1,7 +1,6 @@
 package cose457.drawingtool.view;
 
 import cose457.drawingtool.model.ShapeType;
-import cose457.drawingtool.view.viewmodelvisitor.ShapeRenderer;
 import cose457.drawingtool.viewmodel.CanvasViewModel;
 import cose457.drawingtool.viewmodel.ShapeViewModel;
 import javafx.fxml.FXML;

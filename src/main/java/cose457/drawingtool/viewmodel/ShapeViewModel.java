@@ -3,7 +3,6 @@ package cose457.drawingtool.viewmodel;
 import cose457.drawingtool.model.ShapeModel;
 import cose457.drawingtool.util.Observable;
 import cose457.drawingtool.util.ObservableValue;
-import cose457.drawingtool.view.viewmodelvisitor.ShapeViewModelVisitor;
 import lombok.Getter;
 
 public abstract class ShapeViewModel {
@@ -29,5 +28,5 @@ public abstract class ShapeViewModel {
         this.height.set(model.getHeight());
         this.zOrder.set(model.getZOrder());
     }
-    
+
 }
