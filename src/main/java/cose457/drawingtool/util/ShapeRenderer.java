@@ -88,6 +88,15 @@ public class ShapeRenderer implements ShapeViewModelVisitor {
                     viewModel.getX() + 5, viewModel.getY() + viewModel.getHeight() / 2
             );
         }
+        if (viewModel.isSelected()) {
+            gc.setStroke(Color.BLUE);
+            gc.setLineDashes(6);
+            gc.strokeRect(
+                    viewModel.getX(), viewModel.getY(),
+                    viewModel.getWidth(), viewModel.getHeight()
+            );
+            gc.setLineDashes(0);
+        }
     }
 
     @Override
@@ -105,5 +114,14 @@ public class ShapeRenderer implements ShapeViewModelVisitor {
                 "IMAGE",
                 viewModel.getX() + 5, viewModel.getY() + 20
         );
+        if (viewModel.isSelected()) {
+            gc.setStroke(Color.BLUE);
+            gc.setLineDashes(6);
+            gc.strokeRect(
+                    viewModel.getX(), viewModel.getY(),
+                    viewModel.getWidth(), viewModel.getHeight()
+            );
+            gc.setLineDashes(0);
+        }
     }
 }
