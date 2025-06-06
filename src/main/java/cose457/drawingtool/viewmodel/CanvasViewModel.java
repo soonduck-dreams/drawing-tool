@@ -5,6 +5,7 @@ import cose457.drawingtool.command.Command;
 import cose457.drawingtool.command.SelectShapeCommand;
 import cose457.drawingtool.command.MoveSelectedShapesCommand;
 import cose457.drawingtool.command.SelectShapesInAreaCommand;
+import cose457.drawingtool.command.SetSelectedShapesBoundsCommand;
 import cose457.drawingtool.factory.ShapeModelFactory;
 import cose457.drawingtool.factory.ShapeViewModelFactory;
 import cose457.drawingtool.model.CanvasModel;
@@ -75,6 +76,11 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
 
     public void moveSelectedShapes(double dx, double dy) {
         Command command = new MoveSelectedShapesCommand(this, dx, dy);
+        executeCommand(command);
+    }
+
+    public void setSelectedShapesBounds(double x, double y, double width, double height) {
+        Command command = new SetSelectedShapesBoundsCommand(this, x, y, width, height);
         executeCommand(command);
     }
 

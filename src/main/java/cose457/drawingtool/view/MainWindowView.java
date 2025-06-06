@@ -13,6 +13,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.geometry.Pos;
+import javafx.scene.control.TextField;
+
+import java.util.Arrays;
+import java.util.function.Consumer;
 
 import java.util.List;
 
@@ -46,6 +52,9 @@ public class MainWindowView {
     @FXML
     public void initialize() {
         gc = drawCanvas.getGraphicsContext2D();
+
+        propertyPanel.setSpacing(8);
+        propertyPanel.setStyle("-fx-padding:10;-fx-border-color:#cccccc;-fx-background-color:#f8f8f8;");
 
         btnSelect.selectedProperty().addListener((obs, o, n) -> {
             isDragging = false;
@@ -177,15 +186,74 @@ public class MainWindowView {
 
     private void updatePropertyPanel(List<ShapeViewModel> shapeViewModels) {
         propertyPanel.getChildren().clear();
-        int index = 1;
-        for (ShapeViewModel vm : shapeViewModels) {
-            if (vm.isSelected()) {
-                String text = String.format(
-                        "Shape %d - x: %.1f y: %.1f w: %.1f h: %.1f",
-                        index++, vm.getX(), vm.getY(), vm.getWidth(), vm.getHeight());
-                propertyPanel.getChildren().add(new Label(text));
-            }
+
+        List<ShapeViewModel> selected = shapeViewModels.stream()
+                .filter(ShapeViewModel::isSelected)
+                .toList();
+
+        if (selected.isEmpty()) {
+            propertyPanel.getChildren().add(new Label("No shape selected"));
+            return;
         }
+
+        double[] bounds = calculateBounds(selected);
+        double[] current = Arrays.copyOf(bounds, 4);
+
+        if (selected.size() == 1) {
+            Label title = new Label("Shape");
+            title.setStyle("-fx-font-weight: bold;");
+            propertyPanel.getChildren().add(title);
+        } else {
+            Label title = new Label("여러 개의 도형");
+            title.setStyle("-fx-font-weight: bold;");
+            propertyPanel.getChildren().add(title);
+        }
+
+        addField("X", bounds[0], v -> { current[0] = v; applyBounds(current); });
+        addField("Y", bounds[1], v -> { current[1] = v; applyBounds(current); });
+        addField("W", bounds[2], v -> { current[2] = v; applyBounds(current); });
+        addField("H", bounds[3], v -> { current[3] = v; applyBounds(current); });
+    }
+
+    private void applyBounds(double[] b) {
+        canvasViewModel.setSelectedShapesBounds(b[0], b[1], b[2], b[3]);
+    }
+
+    private HBox addField(String name, double value, Consumer<Double> updater) {
+        HBox row = new HBox(5);
+        row.setAlignment(Pos.CENTER_LEFT);
+        Label label = new Label(name + ":");
+        TextField field = new TextField(String.format("%.1f", value));
+        field.setPrefWidth(70);
+        Runnable commit = () -> {
+            try {
+                double v = Double.parseDouble(field.getText());
+                updater.accept(v);
+            } catch (NumberFormatException ignore) {
+                field.setText(String.format("%.1f", value));
+            }
+        };
+        field.setOnAction(e -> commit.run());
+        field.focusedProperty().addListener((obs, o, n) -> { if (!n) commit.run(); });
+        row.getChildren().addAll(label, field);
+        propertyPanel.getChildren().add(row);
+        return row;
+    }
+
+    private double[] calculateBounds(List<ShapeViewModel> vms) {
+        double minX = vms.stream()
+                .mapToDouble(vm -> Math.min(vm.getX(), vm.getX() + vm.getWidth()))
+                .min().orElse(0);
+        double minY = vms.stream()
+                .mapToDouble(vm -> Math.min(vm.getY(), vm.getY() + vm.getHeight()))
+                .min().orElse(0);
+        double maxX = vms.stream()
+                .mapToDouble(vm -> Math.max(vm.getX(), vm.getX() + vm.getWidth()))
+                .max().orElse(0);
+        double maxY = vms.stream()
+                .mapToDouble(vm -> Math.max(vm.getY(), vm.getY() + vm.getHeight()))
+                .max().orElse(0);
+        return new double[]{minX, minY, maxX - minX, maxY - minY};
     }
 
 }
