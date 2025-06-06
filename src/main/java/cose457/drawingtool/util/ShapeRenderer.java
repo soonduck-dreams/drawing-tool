@@ -7,9 +7,40 @@ import javafx.scene.paint.Color;
 public class ShapeRenderer implements ShapeViewModelVisitor {
 
     private final GraphicsContext gc;
+    private static final Color SELECTION_COLOR = Color.DODGERBLUE;
+    private static final double HANDLE_SIZE = 6;
 
     public ShapeRenderer(GraphicsContext gc) {
         this.gc = gc;
+    }
+
+    private void drawSelectionBox(double x, double y, double width, double height) {
+        gc.setStroke(SELECTION_COLOR);
+        gc.setLineWidth(2);
+        gc.setLineDashes(6);
+        gc.strokeRect(x, y, width, height);
+        gc.setLineDashes(0);
+
+        double half = HANDLE_SIZE / 2;
+        gc.setFill(SELECTION_COLOR);
+        double[] xs = {x, x + width, x, x + width};
+        double[] ys = {y, y, y + height, y + height};
+        for (int i = 0; i < xs.length; i++) {
+            gc.fillRect(xs[i] - half, ys[i] - half, HANDLE_SIZE, HANDLE_SIZE);
+        }
+    }
+
+    private void drawSelectionLine(double x1, double y1, double x2, double y2) {
+        gc.setStroke(SELECTION_COLOR);
+        gc.setLineWidth(2);
+        gc.setLineDashes(6);
+        gc.strokeLine(x1, y1, x2, y2);
+        gc.setLineDashes(0);
+
+        double half = HANDLE_SIZE / 2;
+        gc.setFill(SELECTION_COLOR);
+        gc.fillRect(x1 - half, y1 - half, HANDLE_SIZE, HANDLE_SIZE);
+        gc.fillRect(x2 - half, y2 - half, HANDLE_SIZE, HANDLE_SIZE);
     }
 
     @Override
@@ -20,15 +51,12 @@ public class ShapeRenderer implements ShapeViewModelVisitor {
                 viewModel.getX(), viewModel.getY(),
                 viewModel.getWidth(), viewModel.getHeight()
         );
-        // 선택 표시
         if (viewModel.isSelected()) {
-            gc.setStroke(Color.BLUE);
-            gc.setLineDashes(6);
-            gc.strokeRect(
-                    viewModel.getX(), viewModel.getY(),
-                    viewModel.getWidth(), viewModel.getHeight()
-            );
-            gc.setLineDashes(0);
+            drawSelectionBox(
+                    viewModel.getX(),
+                    viewModel.getY(),
+                    viewModel.getWidth(),
+                    viewModel.getHeight());
         }
     }
 
@@ -41,13 +69,11 @@ public class ShapeRenderer implements ShapeViewModelVisitor {
                 viewModel.getWidth(), viewModel.getHeight()
         );
         if (viewModel.isSelected()) {
-            gc.setStroke(Color.BLUE);
-            gc.setLineDashes(6);
-            gc.strokeOval(
-                    viewModel.getX(), viewModel.getY(),
-                    viewModel.getWidth(), viewModel.getHeight()
-            );
-            gc.setLineDashes(0);
+            drawSelectionBox(
+                    viewModel.getX(),
+                    viewModel.getY(),
+                    viewModel.getWidth(),
+                    viewModel.getHeight());
         }
     }
 
@@ -61,14 +87,11 @@ public class ShapeRenderer implements ShapeViewModelVisitor {
                 viewModel.getY() + viewModel.getHeight()
         );
         if (viewModel.isSelected()) {
-            gc.setStroke(Color.BLUE);
-            gc.setLineDashes(6);
-            gc.strokeLine(
-                    viewModel.getX(), viewModel.getY(),
+            drawSelectionLine(
+                    viewModel.getX(),
+                    viewModel.getY(),
                     viewModel.getX() + viewModel.getWidth(),
-                    viewModel.getY() + viewModel.getHeight()
-            );
-            gc.setLineDashes(0);
+                    viewModel.getY() + viewModel.getHeight());
         }
     }
 
@@ -89,13 +112,11 @@ public class ShapeRenderer implements ShapeViewModelVisitor {
             );
         }
         if (viewModel.isSelected()) {
-            gc.setStroke(Color.BLUE);
-            gc.setLineDashes(6);
-            gc.strokeRect(
-                    viewModel.getX(), viewModel.getY(),
-                    viewModel.getWidth(), viewModel.getHeight()
-            );
-            gc.setLineDashes(0);
+            drawSelectionBox(
+                    viewModel.getX(),
+                    viewModel.getY(),
+                    viewModel.getWidth(),
+                    viewModel.getHeight());
         }
     }
 
@@ -115,13 +136,11 @@ public class ShapeRenderer implements ShapeViewModelVisitor {
                 viewModel.getX() + 5, viewModel.getY() + 20
         );
         if (viewModel.isSelected()) {
-            gc.setStroke(Color.BLUE);
-            gc.setLineDashes(6);
-            gc.strokeRect(
-                    viewModel.getX(), viewModel.getY(),
-                    viewModel.getWidth(), viewModel.getHeight()
-            );
-            gc.setLineDashes(0);
+            drawSelectionBox(
+                    viewModel.getX(),
+                    viewModel.getY(),
+                    viewModel.getWidth(),
+                    viewModel.getHeight());
         }
     }
 }
