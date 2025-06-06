@@ -12,6 +12,7 @@ public class HelloApplication extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("view/MainWindow.fxml"));
         Scene scene = new Scene(loader.load());
+        scene.getStylesheets().add(HelloApplication.class.getResource("style.css").toExternalForm());
         stage.setTitle("Vector Drawing Tool");
         stage.setScene(scene);
         stage.show();

@@ -56,6 +56,8 @@ public class MainWindowView {
         propertyPanel.setSpacing(8);
         propertyPanel.setStyle("-fx-padding:10;-fx-border-color:#cccccc;-fx-background-color:#f8f8f8;");
 
+        shapeTypeComboBox.getSelectionModel().select("Rectangle");
+
         btnSelect.selectedProperty().addListener((obs, o, n) -> {
             isDragging = false;
             isSelecting = false;
