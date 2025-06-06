@@ -6,6 +6,7 @@ import cose457.drawingtool.command.SelectShapeCommand;
 import cose457.drawingtool.command.MoveSelectedShapesCommand;
 import cose457.drawingtool.command.SelectShapesInAreaCommand;
 import cose457.drawingtool.command.ChangeZOrderCommand;
+import cose457.drawingtool.command.SetSelectedShapesBoundsCommand;
 import cose457.drawingtool.factory.ShapeModelFactory;
 import cose457.drawingtool.factory.ShapeViewModelFactory;
 import cose457.drawingtool.model.CanvasModel;
@@ -86,6 +87,7 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
         executeCommand(command);
     }
 
+
     public void bringSelectedToFront() {
         Command command = new ChangeZOrderCommand(canvasModel, getSelectedModels(), ChangeZOrderCommand.Type.BRING_TO_FRONT);
         executeCommand(command);
@@ -103,6 +105,11 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
 
     public void sendSelectedBackward() {
         Command command = new ChangeZOrderCommand(canvasModel, getSelectedModels(), ChangeZOrderCommand.Type.SEND_BACKWARD);
+        executeCommand(command);
+    }
+
+    public void setSelectedShapesBounds(double x, double y, double width, double height) {
+        Command command = new SetSelectedShapesBoundsCommand(this, x, y, width, height);
         executeCommand(command);
     }
 
