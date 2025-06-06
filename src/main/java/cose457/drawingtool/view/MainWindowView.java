@@ -66,6 +66,11 @@ public class MainWindowView {
             btnSelect.setSelected(false);
         });
 
+        btnBringToFront.setOnAction(e -> canvasViewModel.bringSelectedToFront());
+        btnSendToBack.setOnAction(e -> canvasViewModel.sendSelectedToBack());
+        btnBringForward.setOnAction(e -> canvasViewModel.bringSelectedForward());
+        btnSendBackward.setOnAction(e -> canvasViewModel.sendSelectedBackward());
+
         drawCanvas.setOnMousePressed(e -> {
             startX = e.getX();
             startY = e.getY();

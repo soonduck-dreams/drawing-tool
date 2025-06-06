@@ -5,6 +5,7 @@ import cose457.drawingtool.command.Command;
 import cose457.drawingtool.command.SelectShapeCommand;
 import cose457.drawingtool.command.MoveSelectedShapesCommand;
 import cose457.drawingtool.command.SelectShapesInAreaCommand;
+import cose457.drawingtool.command.ChangeZOrderCommand;
 import cose457.drawingtool.command.SetSelectedShapesBoundsCommand;
 import cose457.drawingtool.factory.ShapeModelFactory;
 import cose457.drawingtool.factory.ShapeViewModelFactory;
@@ -74,8 +75,36 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
                 .anyMatch(vm -> vm.isSelected() && contains(vm, x, y));
     }
 
+    private List<ShapeModel> getSelectedModels() {
+        return shapeViewModels.stream()
+                .filter(ShapeViewModel::isSelected)
+                .map(ShapeViewModel::getModel)
+                .toList();
+    }
+
     public void moveSelectedShapes(double dx, double dy) {
         Command command = new MoveSelectedShapesCommand(this, dx, dy);
+        executeCommand(command);
+    }
+
+
+    public void bringSelectedToFront() {
+        Command command = new ChangeZOrderCommand(canvasModel, getSelectedModels(), ChangeZOrderCommand.Type.BRING_TO_FRONT);
+        executeCommand(command);
+    }
+
+    public void sendSelectedToBack() {
+        Command command = new ChangeZOrderCommand(canvasModel, getSelectedModels(), ChangeZOrderCommand.Type.SEND_TO_BACK);
+        executeCommand(command);
+    }
+
+    public void bringSelectedForward() {
+        Command command = new ChangeZOrderCommand(canvasModel, getSelectedModels(), ChangeZOrderCommand.Type.BRING_FORWARD);
+        executeCommand(command);
+    }
+
+    public void sendSelectedBackward() {
+        Command command = new ChangeZOrderCommand(canvasModel, getSelectedModels(), ChangeZOrderCommand.Type.SEND_BACKWARD);
         executeCommand(command);
     }
 
