@@ -2,6 +2,7 @@ package cose457.drawingtool.viewmodel;
 
 import cose457.drawingtool.command.AddShapeCommand;
 import cose457.drawingtool.command.Command;
+import cose457.drawingtool.command.SelectShapeCommand;
 import cose457.drawingtool.factory.ShapeModelFactory;
 import cose457.drawingtool.factory.ShapeViewModelFactory;
 import cose457.drawingtool.model.CanvasModel;
@@ -57,6 +58,34 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
             cmd.execute();
             undoStack.push(cmd);
         }
+    }
+
+    public void clearSelection() {
+        for (ShapeViewModel vm : shapeViewModels) {
+            vm.setSelected(false);
+        }
+    }
+
+    /**
+     * Select the top-most shape that contains the given point.
+     */
+    public void selectShapeAt(double x, double y) {
+        ShapeViewModel target = shapeViewModels.stream()
+                .filter(vm -> contains(vm, x, y))
+                .max((a, b) -> Integer.compare(a.getZOrder(), b.getZOrder()))
+                .orElse(null);
+
+        SelectShapeCommand command = new SelectShapeCommand(this, target);
+        executeCommand(command);
+    }
+
+    private boolean contains(ShapeViewModel vm, double px, double py) {
+        double vx = vm.getX();
+        double vy = vm.getY();
+        double vw = vm.getWidth();
+        double vh = vm.getHeight();
+
+        return px >= vx && px <= vx + vw && py >= vy && py <= vy + vh;
     }
 
     /**

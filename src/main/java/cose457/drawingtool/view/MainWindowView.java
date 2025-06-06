@@ -79,13 +79,17 @@ public class MainWindowView {
             if (!isDragging) return;
             isDragging = false;
             double endX = e.getX(), endY = e.getY();
-            double x = Math.min(startX, endX);
-            double y = Math.min(startY, endY);
             double width = Math.abs(endX - startX);
             double height = Math.abs(endY - startY);
 
-            ShapeType type = getSelectedShapeType();
-            canvasViewModel.addShape(type, x, y, width, height);
+            if (width == 0 && height == 0) {
+                canvasViewModel.selectShapeAt(endX, endY);
+            } else {
+                double x = Math.min(startX, endX);
+                double y = Math.min(startY, endY);
+                ShapeType type = getSelectedShapeType();
+                canvasViewModel.addShape(type, x, y, width, height);
+            }
         });
 
         canvasViewModel.addListener(this::redrawCanvas);
