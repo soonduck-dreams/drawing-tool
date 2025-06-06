@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
@@ -151,7 +152,10 @@ public class MainWindowView {
             }
         });
 
-        canvasViewModel.addListener(this::redrawCanvas);
+        canvasViewModel.addListener(vms -> {
+            redrawCanvas(vms);
+            updatePropertyPanel(vms);
+        });
     }
 
     private ShapeType getSelectedShapeType() {
@@ -168,6 +172,19 @@ public class MainWindowView {
         gc.clearRect(0, 0, drawCanvas.getWidth(), drawCanvas.getHeight());
         for (var shapeViewModel : shapeViewModels) {
             shapeViewModel.accept(new ShapeRenderer(gc));
+        }
+    }
+
+    private void updatePropertyPanel(List<ShapeViewModel> shapeViewModels) {
+        propertyPanel.getChildren().clear();
+        int index = 1;
+        for (ShapeViewModel vm : shapeViewModels) {
+            if (vm.isSelected()) {
+                String text = String.format(
+                        "Shape %d - x: %.1f y: %.1f w: %.1f h: %.1f",
+                        index++, vm.getX(), vm.getY(), vm.getWidth(), vm.getHeight());
+                propertyPanel.getChildren().add(new Label(text));
+            }
         }
     }
 
