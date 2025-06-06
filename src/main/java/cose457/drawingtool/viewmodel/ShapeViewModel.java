@@ -1,10 +1,9 @@
 package cose457.drawingtool.viewmodel;
 
 import cose457.drawingtool.model.ShapeModel;
-import cose457.drawingtool.util.Observable;
-import cose457.drawingtool.util.ObservableValue;
 import cose457.drawingtool.util.ShapeViewModelVisitor;
 import lombok.Getter;
+import javafx.scene.paint.Color;
 
 public abstract class ShapeViewModel {
 
@@ -22,6 +21,7 @@ public abstract class ShapeViewModel {
     public double getWidth() { return model.getWidth(); }
     public double getHeight() { return model.getHeight(); }
     public int getZOrder() { return model.getZOrder(); }
+    public Color getFillColor() { return model.getFillColor(); }
 
     // 선택 상태 getter/setter
     public boolean isSelected() { return selected; }
