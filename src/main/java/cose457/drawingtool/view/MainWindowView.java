@@ -210,7 +210,7 @@ public class MainWindowView {
         double[] current = Arrays.copyOf(bounds, 4);
 
         if (selected.size() == 1) {
-            Label title = new Label("Shape");
+            Label title = new Label("도형");
             title.setStyle("-fx-font-weight: bold;");
             propertyPanel.getChildren().add(title);
         } else {

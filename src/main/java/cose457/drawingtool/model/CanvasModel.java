@@ -26,6 +26,7 @@ public class CanvasModel implements Observable<List<ShapeModel>> {
 
     public void addShape(ShapeModel shape) {
         shapes.add(shape);
+        updateZOrders();
         notifyListeners();
     }
 

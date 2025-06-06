@@ -3,6 +3,8 @@ package cose457.drawingtool.util;
 import cose457.drawingtool.viewmodel.*;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 public class ShapeRenderer implements ShapeViewModelVisitor {
 
@@ -108,7 +110,7 @@ public class ShapeRenderer implements ShapeViewModelVisitor {
     @Override
     public void visit(TextViewModel viewModel) {
         gc.setStroke(Color.BLACK);
-        gc.setLineWidth(1);
+        gc.setLineWidth(0.1);
         gc.strokeRect(
                 viewModel.getX(), viewModel.getY(),
                 viewModel.getWidth(), viewModel.getHeight()
@@ -116,6 +118,7 @@ public class ShapeRenderer implements ShapeViewModelVisitor {
         gc.setFill(viewModel.getFillColor());
         String text = viewModel.getText();
         if (text != null) {
+            gc.setFont(Font.font("System", FontWeight.BOLD, 30));
             gc.fillText(
                     text,
                     viewModel.getX() + 5, viewModel.getY() + viewModel.getHeight() / 2
