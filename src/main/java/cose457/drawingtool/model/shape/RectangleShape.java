@@ -1,9 +1,6 @@
-package cose457.drawingtool.model;
+package cose457.drawingtool.model.shape;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import cose457.drawingtool.model.ShapeModel;
 
 public class RectangleShape extends ShapeModel {
 

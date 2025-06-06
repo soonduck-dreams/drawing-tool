@@ -3,6 +3,7 @@ package cose457.drawingtool.viewmodel;
 import cose457.drawingtool.model.ShapeModel;
 import cose457.drawingtool.util.Observable;
 import cose457.drawingtool.util.ObservableValue;
+import cose457.drawingtool.util.ShapeViewModelVisitor;
 import lombok.Getter;
 
 public abstract class ShapeViewModel {
@@ -10,23 +11,21 @@ public abstract class ShapeViewModel {
     @Getter
     protected final ShapeModel model;
 
-    public final Observable<Double> x = new ObservableValue<>(0.0);
-    public final Observable<Double> y = new ObservableValue<>(0.0);
-    public final Observable<Double> width = new ObservableValue<>(0.0);
-    public final Observable<Double> height = new ObservableValue<>(0.0);
-
-    public final Observable<Integer> zOrder = new ObservableValue<>(0);
-    public final Observable<Boolean> selected = new ObservableValue<>(false);
+    private boolean selected = false;
 
     public ShapeViewModel(ShapeModel model) {
         this.model = model;
-
-        // Model → Observable 초기화
-        this.x.set(model.getX());
-        this.y.set(model.getY());
-        this.width.set(model.getWidth());
-        this.height.set(model.getHeight());
-        this.zOrder.set(model.getZOrder());
     }
 
+    public double getX() { return model.getX(); }
+    public double getY() { return model.getY(); }
+    public double getWidth() { return model.getWidth(); }
+    public double getHeight() { return model.getHeight(); }
+    public int getZOrder() { return model.getZOrder(); }
+
+    // 선택 상태 getter/setter
+    public boolean isSelected() { return selected; }
+    public void setSelected(boolean selected) { this.selected = selected; }
+
+    public abstract void accept(ShapeViewModelVisitor visitor);
 }

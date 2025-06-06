@@ -1,12 +1,10 @@
 package cose457.drawingtool.viewmodel;
 
 import cose457.drawingtool.command.Command;
+import cose457.drawingtool.factory.ShapeViewModelFactory;
 import cose457.drawingtool.model.CanvasModel;
 import cose457.drawingtool.model.ShapeModel;
-import cose457.drawingtool.model.ShapeType;
-import cose457.drawingtool.util.Observable;
 import cose457.drawingtool.util.ObservableList;
-import cose457.drawingtool.util.ObservableValue;
 import lombok.Getter;
 
 import java.util.ArrayDeque;

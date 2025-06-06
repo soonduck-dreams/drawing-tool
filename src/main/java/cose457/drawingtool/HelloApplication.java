@@ -1,6 +1,5 @@
 package cose457.drawingtool;
 
-import cose457.drawingtool.viewmodel.RectangleShapeViewModel;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
