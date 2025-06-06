@@ -7,6 +7,7 @@ import cose457.drawingtool.command.MoveSelectedShapesCommand;
 import cose457.drawingtool.command.SelectShapesInAreaCommand;
 import cose457.drawingtool.command.ChangeZOrderCommand;
 import cose457.drawingtool.command.SetSelectedShapesBoundsCommand;
+import cose457.drawingtool.command.SetSelectedShapesFillColorCommand;
 import cose457.drawingtool.factory.ShapeModelFactory;
 import cose457.drawingtool.factory.ShapeViewModelFactory;
 import cose457.drawingtool.model.CanvasModel;
@@ -14,6 +15,7 @@ import cose457.drawingtool.model.ShapeModel;
 import cose457.drawingtool.model.ShapeType;
 import cose457.drawingtool.util.Observable;
 import lombok.Getter;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -113,6 +115,11 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
         executeCommand(command);
     }
 
+    public void setSelectedShapesFillColor(Color color) {
+        Command command = new SetSelectedShapesFillColorCommand(this, color);
+        executeCommand(command);
+    }
+
     public void selectShapesInArea(double x, double y, double width, double height) {
         Command command = new SelectShapesInAreaCommand(this, x, y, width, height);
         executeCommand(command);
@@ -154,15 +161,25 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
         ShapeModel model;
         switch (type) {
             case RECTANGLE -> model = ShapeModelFactory.rectangle()
-                    .x(x).y(y).width(width).height(height).zOrder(0).build();
+                    .x(x).y(y).width(width).height(height)
+                    .fillColor(Color.WHITE)
+                    .zOrder(0).build();
             case ELLIPSE -> model = ShapeModelFactory.ellipse()
-                    .x(x).y(y).width(width).height(height).zOrder(0).build();
+                    .x(x).y(y).width(width).height(height)
+                    .fillColor(Color.WHITE)
+                    .zOrder(0).build();
             case LINE -> model = ShapeModelFactory.line()
-                    .x(x).y(y).width(width).height(height).zOrder(0).build();
+                    .x(x).y(y).width(width).height(height)
+                    .fillColor(Color.BLACK)
+                    .zOrder(0).build();
             case TEXT -> model = ShapeModelFactory.text()
-                    .x(x).y(y).width(width).height(height).zOrder(0).build();
+                    .x(x).y(y).width(width).height(height)
+                    .fillColor(Color.BLACK)
+                    .zOrder(0).build();
             case IMAGE -> model = ShapeModelFactory.image()
-                    .x(x).y(y).width(width).height(height).zOrder(0).build();
+                    .x(x).y(y).width(width).height(height)
+                    .fillColor(Color.TRANSPARENT)
+                    .zOrder(0).build();
             default -> {
                 return;
             }

@@ -16,6 +16,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.paint.Color;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -218,6 +220,9 @@ public class MainWindowView {
         addField("Y", bounds[1], v -> { current[1] = v; applyBounds(current); });
         addField("W", bounds[2], v -> { current[2] = v; applyBounds(current); });
         addField("H", bounds[3], v -> { current[3] = v; applyBounds(current); });
+
+        Color initialColor = selected.get(0).getFillColor();
+        addColorField(initialColor);
     }
 
     private void applyBounds(double[] b) {
@@ -243,6 +248,21 @@ public class MainWindowView {
         row.getChildren().addAll(label, field);
         propertyPanel.getChildren().add(row);
         return row;
+    }
+
+    private HBox addColorField(Color value) {
+        HBox row = new HBox(5);
+        row.setAlignment(Pos.CENTER_LEFT);
+        Label label = new Label("Color:");
+        ColorPicker picker = new ColorPicker(value);
+        picker.setOnAction(e -> applyFillColor(picker.getValue()));
+        row.getChildren().addAll(label, picker);
+        propertyPanel.getChildren().add(row);
+        return row;
+    }
+
+    private void applyFillColor(Color color) {
+        canvasViewModel.setSelectedShapesFillColor(color);
     }
 
     private double[] calculateBounds(List<ShapeViewModel> vms) {
