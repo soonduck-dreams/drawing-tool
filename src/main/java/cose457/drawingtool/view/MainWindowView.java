@@ -16,7 +16,6 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
-import java.util.Map;
 
 public class MainWindowView {
     @FXML
@@ -61,7 +60,7 @@ public class MainWindowView {
             double height = Math.abs(curY - startY);
 
             // 미리보기용으로 전체 클리어 → 기존 도형도 다시 그리기
-            redrawCanvas(); // 아래에 구현
+            redrawCanvas(canvasViewModel.get()); // 아래에 구현
 
             // 현재 도형 타입별 미리보기
             gc.setStroke(javafx.scene.paint.Color.DARKGRAY);
@@ -110,7 +109,7 @@ public class MainWindowView {
             canvasViewModel.executeCommand(command);
         });
 
-        canvasViewModel.getShapes().addListener(shapes -> redrawCanvas());
+        canvasViewModel.addListener(this::redrawCanvas);
     }
 
     private ShapeType getSelectedShapeType() {
@@ -123,14 +122,10 @@ public class MainWindowView {
         }
     }
 
-    private void redrawCanvas() {
+    private void redrawCanvas(List<ShapeViewModel> shapeViewModels) {
         gc.clearRect(0, 0, drawCanvas.getWidth(), drawCanvas.getHeight());
-        List<ShapeViewModel> shapes = canvasViewModel.getShapes().get();
-        for (ShapeViewModel shapeVM : shapes) {
-            // ShapeRenderer 또는 직접 분기 처리
-            // 예시: RectangleViewModel이면 gc.strokeRect(...)
-            // ShapeRenderer 패턴 사용 권장
-            shapeVM.accept(new ShapeRenderer(gc));
+        for (var shapeViewModel : shapeViewModels) {
+            shapeViewModel.accept(new ShapeRenderer(gc));
         }
     }
 

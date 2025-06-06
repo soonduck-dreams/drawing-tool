@@ -2,6 +2,7 @@ module cose457.drawingtool {
     requires javafx.controls;
     requires javafx.fxml;
     requires static lombok;
+    requires java.sql;
 
 
     opens cose457.drawingtool to javafx.fxml;
