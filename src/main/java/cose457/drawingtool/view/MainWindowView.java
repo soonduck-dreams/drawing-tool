@@ -4,6 +4,7 @@ import cose457.drawingtool.model.ShapeType;
 import cose457.drawingtool.util.ShapeRenderer;
 import cose457.drawingtool.viewmodel.CanvasViewModel;
 import cose457.drawingtool.viewmodel.ShapeViewModel;
+import cose457.drawingtool.viewmodel.TextViewModel;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -218,6 +219,13 @@ public class MainWindowView {
         addField("Y", bounds[1], v -> { current[1] = v; applyBounds(current); });
         addField("W", bounds[2], v -> { current[2] = v; applyBounds(current); });
         addField("H", bounds[3], v -> { current[3] = v; applyBounds(current); });
+
+        if (selected.size() == 1 && selected.get(0) instanceof TextViewModel tvm) {
+            String currentText = tvm.getText() == null ? "" : tvm.getText();
+            addStringField("Text", currentText, t -> {
+                canvasViewModel.setText(tvm, t);
+            });
+        }
     }
 
     private void applyBounds(double[] b) {
@@ -238,6 +246,20 @@ public class MainWindowView {
                 field.setText(String.format("%.1f", value));
             }
         };
+        field.setOnAction(e -> commit.run());
+        field.focusedProperty().addListener((obs, o, n) -> { if (!n) commit.run(); });
+        row.getChildren().addAll(label, field);
+        propertyPanel.getChildren().add(row);
+        return row;
+    }
+
+    private HBox addStringField(String name, String value, Consumer<String> updater) {
+        HBox row = new HBox(5);
+        row.setAlignment(Pos.CENTER_LEFT);
+        Label label = new Label(name + ":");
+        TextField field = new TextField(value);
+        field.setPrefWidth(100);
+        Runnable commit = () -> updater.accept(field.getText());
         field.setOnAction(e -> commit.run());
         field.focusedProperty().addListener((obs, o, n) -> { if (!n) commit.run(); });
         row.getChildren().addAll(label, field);

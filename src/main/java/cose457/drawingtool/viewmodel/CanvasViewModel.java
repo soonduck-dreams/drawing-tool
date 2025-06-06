@@ -7,6 +7,8 @@ import cose457.drawingtool.command.MoveSelectedShapesCommand;
 import cose457.drawingtool.command.SelectShapesInAreaCommand;
 import cose457.drawingtool.command.ChangeZOrderCommand;
 import cose457.drawingtool.command.SetSelectedShapesBoundsCommand;
+import cose457.drawingtool.command.SetTextCommand;
+import cose457.drawingtool.viewmodel.TextViewModel;
 import cose457.drawingtool.factory.ShapeModelFactory;
 import cose457.drawingtool.factory.ShapeViewModelFactory;
 import cose457.drawingtool.model.CanvasModel;
@@ -105,6 +107,14 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
 
     public void sendSelectedBackward() {
         Command command = new ChangeZOrderCommand(canvasModel, getSelectedModels(), ChangeZOrderCommand.Type.SEND_BACKWARD);
+        executeCommand(command);
+    }
+
+    /**
+     * Update the text of the given TextViewModel via a command.
+     */
+    public void setText(TextViewModel viewModel, String newText) {
+        Command command = new SetTextCommand(this, viewModel, newText);
         executeCommand(command);
     }
 

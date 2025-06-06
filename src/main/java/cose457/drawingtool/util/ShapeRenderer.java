@@ -104,7 +104,7 @@ public class ShapeRenderer implements ShapeViewModelVisitor {
                 viewModel.getWidth(), viewModel.getHeight()
         );
         gc.setFill(Color.BLACK);
-        String text = viewModel.text.get();
+        String text = viewModel.getText();
         if (text != null) {
             gc.fillText(
                     text,
