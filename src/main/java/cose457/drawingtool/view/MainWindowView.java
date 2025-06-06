@@ -106,6 +106,8 @@ public class MainWindowView {
                 switch (type) {
                     case RECTANGLE -> gc.strokeRect(x, y, width, height);
                     case ELLIPSE -> gc.strokeOval(x, y, width, height);
+                    case LINE -> gc.strokeLine(startX, startY, curX, curY);
+                    case TEXT, IMAGE -> gc.strokeRect(x, y, width, height);
                 }
                 gc.setLineDashes(0);
             }
@@ -130,13 +132,21 @@ public class MainWindowView {
                 }
             } else if (isDragging) {
                 isDragging = false;
-                double width = Math.abs(endX - startX);
-                double height = Math.abs(endY - startY);
-                if (width > 0 || height > 0) {
-                    double x = Math.min(startX, endX);
-                    double y = Math.min(startY, endY);
-                    ShapeType type = getSelectedShapeType();
-                    canvasViewModel.addShape(type, x, y, width, height);
+                ShapeType type = getSelectedShapeType();
+                if (type == ShapeType.LINE) {
+                    double width = endX - startX;
+                    double height = endY - startY;
+                    if (width != 0 || height != 0) {
+                        canvasViewModel.addShape(type, startX, startY, width, height);
+                    }
+                } else {
+                    double width = Math.abs(endX - startX);
+                    double height = Math.abs(endY - startY);
+                    if (width > 0 || height > 0) {
+                        double x = Math.min(startX, endX);
+                        double y = Math.min(startY, endY);
+                        canvasViewModel.addShape(type, x, y, width, height);
+                    }
                 }
             }
         });
