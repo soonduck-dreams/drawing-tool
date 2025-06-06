@@ -1,14 +1,15 @@
 package cose457.drawingtool.viewmodel;
 
+import cose457.drawingtool.command.AddShapeCommand;
 import cose457.drawingtool.command.Command;
+import cose457.drawingtool.factory.ShapeModelFactory;
 import cose457.drawingtool.factory.ShapeViewModelFactory;
 import cose457.drawingtool.model.CanvasModel;
 import cose457.drawingtool.model.ShapeModel;
+import cose457.drawingtool.model.ShapeType;
 import cose457.drawingtool.util.Observable;
-import cose457.drawingtool.util.ObservableList;
 import lombok.Getter;
 
-import java.sql.Array;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -26,7 +27,7 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
     private final Deque<Command> undoStack = new ArrayDeque<>();
     private final Deque<Command> redoStack = new ArrayDeque<>();
 
-    ShapeViewModelFactory shapeViewModelFactory = new ShapeViewModelFactory();
+    private final ShapeViewModelFactory shapeViewModelFactory = new ShapeViewModelFactory();
 
     public CanvasViewModel() {
         canvasModel.addListener(shapeModels -> {
@@ -56,6 +57,33 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
             cmd.execute();
             undoStack.push(cmd);
         }
+    }
+
+    /**
+     * Create a shape model based on user parameters and add it to the canvas
+     * through a command. The view only needs to provide the primitive data
+     * required to create the shape.
+     */
+    public void addShape(ShapeType type, double x, double y, double width, double height) {
+        ShapeModel model;
+        switch (type) {
+            case RECTANGLE -> model = ShapeModelFactory.rectangle()
+                    .x(x).y(y).width(width).height(height).zOrder(0).build();
+            case ELLIPSE -> model = ShapeModelFactory.ellipse()
+                    .x(x).y(y).width(width).height(height).zOrder(0).build();
+            case LINE -> model = ShapeModelFactory.line()
+                    .x(x).y(y).width(width).height(height).zOrder(0).build();
+            case TEXT -> model = ShapeModelFactory.text()
+                    .x(x).y(y).width(width).height(height).zOrder(0).build();
+            case IMAGE -> model = ShapeModelFactory.image()
+                    .x(x).y(y).width(width).height(height).zOrder(0).build();
+            default -> {
+                return;
+            }
+        }
+
+        AddShapeCommand command = new AddShapeCommand(canvasModel, model);
+        executeCommand(command);
     }
 
     @Override

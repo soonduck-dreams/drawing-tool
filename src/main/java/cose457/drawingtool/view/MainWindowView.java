@@ -1,8 +1,5 @@
 package cose457.drawingtool.view;
 
-import cose457.drawingtool.command.AddShapeCommand;
-import cose457.drawingtool.factory.ShapeModelFactory;
-import cose457.drawingtool.model.ShapeModel;
 import cose457.drawingtool.model.ShapeType;
 import cose457.drawingtool.util.ShapeRenderer;
 import cose457.drawingtool.viewmodel.CanvasViewModel;
@@ -87,26 +84,8 @@ public class MainWindowView {
             double width = Math.abs(endX - startX);
             double height = Math.abs(endY - startY);
 
-            // 도형 타입에 따라 Model 생성
-            ShapeType type = getSelectedShapeType(); // ComboBox 등에서 선택된 값
-            ShapeModel model;
-            switch (type) {
-                case RECTANGLE:
-                    model = ShapeModelFactory.rectangle()
-                            .x(x).y(y).width(width).height(height).zOrder(0).build();
-                    break;
-                case ELLIPSE:
-                    model = ShapeModelFactory.ellipse()
-                            .x(x).y(y).width(width).height(height).zOrder(0).build();
-                    break;
-                // 기타 도형 생략
-                default:
-                    return;
-            }
-
-            // Command 생성 및 실행
-            AddShapeCommand command = new AddShapeCommand(canvasViewModel.getCanvasModel(), model);
-            canvasViewModel.executeCommand(command);
+            ShapeType type = getSelectedShapeType();
+            canvasViewModel.addShape(type, x, y, width, height);
         });
 
         canvasViewModel.addListener(this::redrawCanvas);
