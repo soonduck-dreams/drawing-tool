@@ -40,7 +40,13 @@ public class SelectShapesInAreaCommand implements Command {
             double vy = vm.getY();
             double vw = vm.getWidth();
             double vh = vm.getHeight();
-            if (vx >= x && vy >= y && (vx + vw) <= x2 && (vy + vh) <= y2) {
+
+            double sx1 = Math.min(vx, vx + vw);
+            double sy1 = Math.min(vy, vy + vh);
+            double sx2 = Math.max(vx, vx + vw);
+            double sy2 = Math.max(vy, vy + vh);
+
+            if (sx1 >= x && sy1 >= y && sx2 <= x2 && sy2 <= y2) {
                 vm.setSelected(true);
             }
         }

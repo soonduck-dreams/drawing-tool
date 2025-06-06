@@ -102,7 +102,12 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
         double vw = vm.getWidth();
         double vh = vm.getHeight();
 
-        return px >= vx && px <= vx + vw && py >= vy && py <= vy + vh;
+        double x1 = Math.min(vx, vx + vw);
+        double y1 = Math.min(vy, vy + vh);
+        double x2 = Math.max(vx, vx + vw);
+        double y2 = Math.max(vy, vy + vh);
+
+        return px >= x1 && px <= x2 && py >= y1 && py <= y2;
     }
 
     /**
