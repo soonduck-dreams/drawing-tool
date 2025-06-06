@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.VBox;
@@ -24,7 +25,7 @@ public class MainWindowView {
     @FXML private Button btnBringForward;
     @FXML private Button btnSendBackward;
     @FXML private Button btnDelete;
-    @FXML private Button btnSelect;
+    @FXML private ToggleButton btnSelect;
 
     @FXML
     private Canvas drawCanvas;
@@ -37,58 +38,106 @@ public class MainWindowView {
 
     private double startX, startY;
     private boolean isDragging = false;
+    private boolean isSelecting = false;
+    private boolean isMoving = false;
+    private double lastX, lastY;
 
     @FXML
     public void initialize() {
         gc = drawCanvas.getGraphicsContext2D();
 
+        btnSelect.selectedProperty().addListener((obs, o, n) -> {
+            isDragging = false;
+            isSelecting = false;
+            isMoving = false;
+        });
+
+        shapeTypeComboBox.valueProperty().addListener((obs, o, n) -> {
+            btnSelect.setSelected(false);
+        });
+
         drawCanvas.setOnMousePressed(e -> {
             startX = e.getX();
             startY = e.getY();
-            isDragging = true;
+            if (btnSelect.isSelected()) {
+                if (canvasViewModel.hasSelectedShapeAt(startX, startY)) {
+                    isMoving = true;
+                    lastX = startX;
+                    lastY = startY;
+                } else {
+                    isSelecting = true;
+                }
+            } else {
+                isDragging = true;
+            }
         });
 
         drawCanvas.setOnMouseDragged(e -> {
-            if (!isDragging) return;
             double curX = e.getX(), curY = e.getY();
-            double x = Math.min(startX, curX);
-            double y = Math.min(startY, curY);
-            double width = Math.abs(curX - startX);
-            double height = Math.abs(curY - startY);
-
-            // 미리보기용으로 전체 클리어 → 기존 도형도 다시 그리기
-            redrawCanvas(canvasViewModel.get()); // 아래에 구현
-
-            // 현재 도형 타입별 미리보기
-            gc.setStroke(javafx.scene.paint.Color.DARKGRAY);
-            gc.setLineDashes(4);
-            ShapeType type = getSelectedShapeType();
-            switch (type) {
-                case RECTANGLE:
+            if (btnSelect.isSelected()) {
+                if (isMoving) {
+                    double dx = curX - lastX;
+                    double dy = curY - lastY;
+                    canvasViewModel.moveSelectedShapes(dx, dy);
+                    lastX = curX;
+                    lastY = curY;
+                } else if (isSelecting) {
+                    redrawCanvas(canvasViewModel.get());
+                    double x = Math.min(startX, curX);
+                    double y = Math.min(startY, curY);
+                    double width = Math.abs(curX - startX);
+                    double height = Math.abs(curY - startY);
+                    gc.setStroke(javafx.scene.paint.Color.DARKGRAY);
+                    gc.setLineDashes(4);
                     gc.strokeRect(x, y, width, height);
-                    break;
-                case ELLIPSE:
-                    gc.strokeOval(x, y, width, height);
-                    break;
-                // 기타 도형
+                    gc.setLineDashes(0);
+                }
+            } else if (isDragging) {
+                double x = Math.min(startX, curX);
+                double y = Math.min(startY, curY);
+                double width = Math.abs(curX - startX);
+                double height = Math.abs(curY - startY);
+
+                redrawCanvas(canvasViewModel.get());
+
+                gc.setStroke(javafx.scene.paint.Color.DARKGRAY);
+                gc.setLineDashes(4);
+                ShapeType type = getSelectedShapeType();
+                switch (type) {
+                    case RECTANGLE -> gc.strokeRect(x, y, width, height);
+                    case ELLIPSE -> gc.strokeOval(x, y, width, height);
+                }
+                gc.setLineDashes(0);
             }
-            gc.setLineDashes(0); // 대시 초기화
         });
 
         drawCanvas.setOnMouseReleased(e -> {
-            if (!isDragging) return;
-            isDragging = false;
             double endX = e.getX(), endY = e.getY();
-            double width = Math.abs(endX - startX);
-            double height = Math.abs(endY - startY);
-
-            if (width == 0 && height == 0) {
-                canvasViewModel.selectShapeAt(endX, endY);
-            } else {
-                double x = Math.min(startX, endX);
-                double y = Math.min(startY, endY);
-                ShapeType type = getSelectedShapeType();
-                canvasViewModel.addShape(type, x, y, width, height);
+            if (btnSelect.isSelected()) {
+                if (isMoving) {
+                    isMoving = false;
+                } else if (isSelecting) {
+                    isSelecting = false;
+                    double width = Math.abs(endX - startX);
+                    double height = Math.abs(endY - startY);
+                    if (width == 0 && height == 0) {
+                        canvasViewModel.selectShapeAt(endX, endY);
+                    } else {
+                        double x = Math.min(startX, endX);
+                        double y = Math.min(startY, endY);
+                        canvasViewModel.selectShapesInArea(x, y, width, height);
+                    }
+                }
+            } else if (isDragging) {
+                isDragging = false;
+                double width = Math.abs(endX - startX);
+                double height = Math.abs(endY - startY);
+                if (width > 0 || height > 0) {
+                    double x = Math.min(startX, endX);
+                    double y = Math.min(startY, endY);
+                    ShapeType type = getSelectedShapeType();
+                    canvasViewModel.addShape(type, x, y, width, height);
+                }
             }
         });
 
