@@ -45,6 +45,11 @@ public class ShapeRenderer implements ShapeViewModelVisitor {
 
     @Override
     public void visit(RectangleViewModel viewModel) {
+        gc.setFill(viewModel.getFillColor());
+        gc.fillRect(
+                viewModel.getX(), viewModel.getY(),
+                viewModel.getWidth(), viewModel.getHeight()
+        );
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(2);
         gc.strokeRect(
@@ -62,6 +67,11 @@ public class ShapeRenderer implements ShapeViewModelVisitor {
 
     @Override
     public void visit(EllipseViewModel viewModel) {
+        gc.setFill(viewModel.getFillColor());
+        gc.fillOval(
+                viewModel.getX(), viewModel.getY(),
+                viewModel.getWidth(), viewModel.getHeight()
+        );
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(2);
         gc.strokeOval(
@@ -79,7 +89,7 @@ public class ShapeRenderer implements ShapeViewModelVisitor {
 
     @Override
     public void visit(LineViewModel viewModel) {
-        gc.setStroke(Color.BLACK);
+        gc.setStroke(viewModel.getFillColor());
         gc.setLineWidth(2);
         gc.strokeLine(
                 viewModel.getX(), viewModel.getY(),
@@ -103,7 +113,7 @@ public class ShapeRenderer implements ShapeViewModelVisitor {
                 viewModel.getX(), viewModel.getY(),
                 viewModel.getWidth(), viewModel.getHeight()
         );
-        gc.setFill(Color.BLACK);
+        gc.setFill(viewModel.getFillColor());
         String text = viewModel.getText();
         if (text != null) {
             gc.fillText(
