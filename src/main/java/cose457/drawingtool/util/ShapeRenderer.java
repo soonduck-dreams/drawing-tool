@@ -5,6 +5,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.image.Image;
 
 public class ShapeRenderer implements ShapeViewModelVisitor {
 
@@ -135,19 +136,32 @@ public class ShapeRenderer implements ShapeViewModelVisitor {
 
     @Override
     public void visit(ImageViewModel viewModel) {
-        // 간단 예시: 실제 Image 객체 로딩 등은 별도 처리 필요
-        String path = viewModel.imagePath.get();
-        // gc.drawImage(...) 등으로 실제 이미지를 그림
-        // 생략, 필요시 자세히 구현
-        gc.setStroke(Color.GRAY);
-        gc.strokeRect(
-                viewModel.getX(), viewModel.getY(),
-                viewModel.getWidth(), viewModel.getHeight()
-        );
-        gc.strokeText(
-                "IMAGE",
-                viewModel.getX() + 5, viewModel.getY() + 20
-        );
+        String path = viewModel.getImagePath();
+        if (path != null && !path.isEmpty()) {
+            try {
+                Image img = new Image("file:" + path);
+                if (!img.isError()) {
+                    gc.drawImage(img, viewModel.getX(), viewModel.getY(),
+                            viewModel.getWidth(), viewModel.getHeight());
+                }
+            } catch (Exception ignore) {
+                // if loading fails draw placeholder
+                gc.setStroke(Color.GRAY);
+                gc.strokeRect(
+                        viewModel.getX(), viewModel.getY(),
+                        viewModel.getWidth(), viewModel.getHeight());
+                gc.strokeText("IMAGE",
+                        viewModel.getX() + 5, viewModel.getY() + 20);
+            }
+        } else {
+            gc.setStroke(Color.GRAY);
+            gc.strokeRect(
+                    viewModel.getX(), viewModel.getY(),
+                    viewModel.getWidth(), viewModel.getHeight());
+            gc.strokeText(
+                    "IMAGE",
+                    viewModel.getX() + 5, viewModel.getY() + 20);
+        }
         if (viewModel.isSelected()) {
             drawSelectionBox(
                     viewModel.getX(),
