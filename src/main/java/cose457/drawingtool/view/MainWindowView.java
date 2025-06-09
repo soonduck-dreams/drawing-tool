@@ -46,6 +46,7 @@ public class MainWindowView {
     @FXML
     private Canvas drawCanvas;
     private GraphicsContext gc;
+    private ShapeRenderer shapeRenderer;
 
     @FXML
     private VBox propertyPanel;
@@ -65,6 +66,7 @@ public class MainWindowView {
     @FXML
     public void initialize() {
         gc = drawCanvas.getGraphicsContext2D();
+        shapeRenderer = new ShapeRenderer(gc);
 
         propertyPanel.setSpacing(8);
         propertyPanel.setStyle("-fx-padding:10;-fx-border-color:#cccccc;-fx-background-color:#f8f8f8;");
@@ -112,7 +114,7 @@ public class MainWindowView {
     private void redrawCanvas(List<ShapeViewModel> shapeViewModels) {
         gc.clearRect(0, 0, drawCanvas.getWidth(), drawCanvas.getHeight());
         for (var shapeViewModel : shapeViewModels) {
-            shapeViewModel.accept(new ShapeRenderer(gc));
+            shapeViewModel.accept(shapeRenderer);
         }
     }
 
