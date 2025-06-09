@@ -36,6 +36,8 @@ public class MainWindowView {
     @FXML private Button btnSendBackward;
     @FXML private Button btnDelete;
     @FXML private ToggleButton btnSelect;
+    @FXML private Button btnUndo;
+    @FXML private Button btnRedo;
 
     @FXML
     private Canvas drawCanvas;
@@ -75,6 +77,9 @@ public class MainWindowView {
         btnSendToBack.setOnAction(e -> canvasViewModel.sendSelectedToBack());
         btnBringForward.setOnAction(e -> canvasViewModel.bringSelectedForward());
         btnSendBackward.setOnAction(e -> canvasViewModel.sendSelectedBackward());
+        btnDelete.setOnAction(e -> canvasViewModel.deleteSelectedShapes());
+        btnUndo.setOnAction(e -> canvasViewModel.undo());
+        btnRedo.setOnAction(e -> canvasViewModel.redo());
 
         drawCanvas.setOnMousePressed(e -> {
             startX = e.getX();

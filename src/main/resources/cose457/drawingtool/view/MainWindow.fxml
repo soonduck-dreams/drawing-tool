@@ -39,6 +39,9 @@
             <Separator orientation="VERTICAL"/>
             <Button fx:id="btnDelete" text="Delete"/>
             <ToggleButton fx:id="btnSelect" text="Select"/>
+            <Separator orientation="VERTICAL"/>
+            <Button fx:id="btnUndo" text="Undo"/>
+            <Button fx:id="btnRedo" text="Redo"/>
         </ToolBar>
     </top>
 

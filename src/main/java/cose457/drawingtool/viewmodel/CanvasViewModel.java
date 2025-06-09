@@ -10,6 +10,7 @@ import cose457.drawingtool.command.SetSelectedShapesBoundsCommand;
 import cose457.drawingtool.command.SetTextCommand;
 import cose457.drawingtool.viewmodel.TextViewModel;
 import cose457.drawingtool.command.SetSelectedShapesFillColorCommand;
+import cose457.drawingtool.command.DeleteShapesCommand;
 import cose457.drawingtool.factory.ShapeModelFactory;
 import cose457.drawingtool.factory.ShapeViewModelFactory;
 import cose457.drawingtool.model.CanvasModel;
@@ -109,6 +110,13 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
 
     public void sendSelectedBackward() {
         Command command = new ChangeZOrderCommand(canvasModel, getSelectedModels(), ChangeZOrderCommand.Type.SEND_BACKWARD);
+        executeCommand(command);
+    }
+
+    public void deleteSelectedShapes() {
+        List<ShapeModel> targets = getSelectedModels();
+        if (targets.isEmpty()) return;
+        Command command = new DeleteShapesCommand(canvasModel, targets);
         executeCommand(command);
     }
 
