@@ -5,6 +5,8 @@ import cose457.drawingtool.util.ShapeRenderer;
 import cose457.drawingtool.viewmodel.CanvasViewModel;
 import cose457.drawingtool.viewmodel.ShapeViewModel;
 import cose457.drawingtool.viewmodel.TextViewModel;
+import cose457.drawingtool.view.state.CanvasState;
+import javafx.scene.input.MouseEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -47,10 +49,13 @@ public class MainWindowView {
     private CanvasViewModel canvasViewModel = new CanvasViewModel();
 
     private double startX, startY;
-    private boolean isDragging = false;
-    private boolean isSelecting = false;
-    private boolean isMoving = false;
     private double lastX, lastY;
+
+    private final CanvasState idleState = new IdleState();
+    private final CanvasState drawingState = new DrawingState();
+    private final CanvasState selectingState = new SelectingState();
+    private final CanvasState movingState = new MovingState();
+    private CanvasState currentState = idleState;
 
     @FXML
     public void initialize() {
@@ -62,9 +67,7 @@ public class MainWindowView {
         shapeTypeComboBox.getSelectionModel().select("Rectangle");
 
         btnSelect.selectedProperty().addListener((obs, o, n) -> {
-            isDragging = false;
-            isSelecting = false;
-            isMoving = false;
+            setState(idleState);
         });
 
         shapeTypeComboBox.valueProperty().addListener((obs, o, n) -> {
@@ -76,100 +79,11 @@ public class MainWindowView {
         btnBringForward.setOnAction(e -> canvasViewModel.bringSelectedForward());
         btnSendBackward.setOnAction(e -> canvasViewModel.sendSelectedBackward());
 
-        drawCanvas.setOnMousePressed(e -> {
-            startX = e.getX();
-            startY = e.getY();
-            if (btnSelect.isSelected()) {
-                if (canvasViewModel.hasSelectedShapeAt(startX, startY)) {
-                    isMoving = true;
-                    lastX = startX;
-                    lastY = startY;
-                } else {
-                    isSelecting = true;
-                }
-            } else {
-                isDragging = true;
-            }
-        });
+        drawCanvas.setOnMousePressed(e -> currentState.onMousePressed(e));
 
-        drawCanvas.setOnMouseDragged(e -> {
-            double curX = e.getX(), curY = e.getY();
-            if (btnSelect.isSelected()) {
-                if (isMoving) {
-                    double dx = curX - lastX;
-                    double dy = curY - lastY;
-                    canvasViewModel.moveSelectedShapes(dx, dy);
-                    lastX = curX;
-                    lastY = curY;
-                } else if (isSelecting) {
-                    redrawCanvas(canvasViewModel.get());
-                    double x = Math.min(startX, curX);
-                    double y = Math.min(startY, curY);
-                    double width = Math.abs(curX - startX);
-                    double height = Math.abs(curY - startY);
-                    gc.setStroke(javafx.scene.paint.Color.DARKGRAY);
-                    gc.setLineDashes(4);
-                    gc.strokeRect(x, y, width, height);
-                    gc.setLineDashes(0);
-                }
-            } else if (isDragging) {
-                double x = Math.min(startX, curX);
-                double y = Math.min(startY, curY);
-                double width = Math.abs(curX - startX);
-                double height = Math.abs(curY - startY);
+        drawCanvas.setOnMouseDragged(e -> currentState.onMouseDragged(e));
 
-                redrawCanvas(canvasViewModel.get());
-
-                gc.setStroke(javafx.scene.paint.Color.DARKGRAY);
-                gc.setLineDashes(4);
-                ShapeType type = getSelectedShapeType();
-                switch (type) {
-                    case RECTANGLE -> gc.strokeRect(x, y, width, height);
-                    case ELLIPSE -> gc.strokeOval(x, y, width, height);
-                    case LINE -> gc.strokeLine(startX, startY, curX, curY);
-                    case TEXT, IMAGE -> gc.strokeRect(x, y, width, height);
-                }
-                gc.setLineDashes(0);
-            }
-        });
-
-        drawCanvas.setOnMouseReleased(e -> {
-            double endX = e.getX(), endY = e.getY();
-            if (btnSelect.isSelected()) {
-                if (isMoving) {
-                    isMoving = false;
-                } else if (isSelecting) {
-                    isSelecting = false;
-                    double width = Math.abs(endX - startX);
-                    double height = Math.abs(endY - startY);
-                    if (width == 0 && height == 0) {
-                        canvasViewModel.selectShapeAt(endX, endY);
-                    } else {
-                        double x = Math.min(startX, endX);
-                        double y = Math.min(startY, endY);
-                        canvasViewModel.selectShapesInArea(x, y, width, height);
-                    }
-                }
-            } else if (isDragging) {
-                isDragging = false;
-                ShapeType type = getSelectedShapeType();
-                if (type == ShapeType.LINE) {
-                    double width = endX - startX;
-                    double height = endY - startY;
-                    if (width != 0 || height != 0) {
-                        canvasViewModel.addShape(type, startX, startY, width, height);
-                    }
-                } else {
-                    double width = Math.abs(endX - startX);
-                    double height = Math.abs(endY - startY);
-                    if (width > 0 || height > 0) {
-                        double x = Math.min(startX, endX);
-                        double y = Math.min(startY, endY);
-                        canvasViewModel.addShape(type, x, y, width, height);
-                    }
-                }
-            }
-        });
+        drawCanvas.setOnMouseReleased(e -> currentState.onMouseReleased(e));
 
         canvasViewModel.addListener(vms -> {
             redrawCanvas(vms);
@@ -303,6 +217,148 @@ public class MainWindowView {
                 .mapToDouble(vm -> Math.max(vm.getY(), vm.getY() + vm.getHeight()))
                 .max().orElse(0);
         return new double[]{minX, minY, maxX - minX, maxY - minY};
+    }
+
+    private void setState(CanvasState state) {
+        currentState = state;
+    }
+
+    private class IdleState implements CanvasState {
+        @Override
+        public void onMousePressed(MouseEvent e) {
+            startX = e.getX();
+            startY = e.getY();
+            if (btnSelect.isSelected()) {
+                if (canvasViewModel.hasSelectedShapeAt(startX, startY)) {
+                    setState(movingState);
+                    currentState.onMousePressed(e);
+                } else {
+                    setState(selectingState);
+                    currentState.onMousePressed(e);
+                }
+            } else {
+                setState(drawingState);
+                currentState.onMousePressed(e);
+            }
+        }
+
+        @Override
+        public void onMouseDragged(MouseEvent e) {}
+
+        @Override
+        public void onMouseReleased(MouseEvent e) {}
+    }
+
+    private class DrawingState implements CanvasState {
+        @Override
+        public void onMousePressed(MouseEvent e) {
+            startX = e.getX();
+            startY = e.getY();
+        }
+
+        @Override
+        public void onMouseDragged(MouseEvent e) {
+            double curX = e.getX(), curY = e.getY();
+            double x = Math.min(startX, curX);
+            double y = Math.min(startY, curY);
+            double width = Math.abs(curX - startX);
+            double height = Math.abs(curY - startY);
+
+            redrawCanvas(canvasViewModel.get());
+
+            gc.setStroke(Color.DARKGRAY);
+            gc.setLineDashes(4);
+            ShapeType type = getSelectedShapeType();
+            switch (type) {
+                case RECTANGLE -> gc.strokeRect(x, y, width, height);
+                case ELLIPSE -> gc.strokeOval(x, y, width, height);
+                case LINE -> gc.strokeLine(startX, startY, curX, curY);
+                case TEXT, IMAGE -> gc.strokeRect(x, y, width, height);
+            }
+            gc.setLineDashes(0);
+        }
+
+        @Override
+        public void onMouseReleased(MouseEvent e) {
+            double endX = e.getX(), endY = e.getY();
+            ShapeType type = getSelectedShapeType();
+            if (type == ShapeType.LINE) {
+                double width = endX - startX;
+                double height = endY - startY;
+                if (width != 0 || height != 0) {
+                    canvasViewModel.addShape(type, startX, startY, width, height);
+                }
+            } else {
+                double width = Math.abs(endX - startX);
+                double height = Math.abs(endY - startY);
+                if (width > 0 || height > 0) {
+                    double x = Math.min(startX, endX);
+                    double y = Math.min(startY, endY);
+                    canvasViewModel.addShape(type, x, y, width, height);
+                }
+            }
+            setState(idleState);
+        }
+    }
+
+    private class SelectingState implements CanvasState {
+        @Override
+        public void onMousePressed(MouseEvent e) {
+            startX = e.getX();
+            startY = e.getY();
+        }
+
+        @Override
+        public void onMouseDragged(MouseEvent e) {
+            double curX = e.getX(), curY = e.getY();
+            redrawCanvas(canvasViewModel.get());
+            double x = Math.min(startX, curX);
+            double y = Math.min(startY, curY);
+            double width = Math.abs(curX - startX);
+            double height = Math.abs(curY - startY);
+            gc.setStroke(Color.DARKGRAY);
+            gc.setLineDashes(4);
+            gc.strokeRect(x, y, width, height);
+            gc.setLineDashes(0);
+        }
+
+        @Override
+        public void onMouseReleased(MouseEvent e) {
+            double endX = e.getX(), endY = e.getY();
+            double width = Math.abs(endX - startX);
+            double height = Math.abs(endY - startY);
+            if (width == 0 && height == 0) {
+                canvasViewModel.selectShapeAt(endX, endY);
+            } else {
+                double x = Math.min(startX, endX);
+                double y = Math.min(startY, endY);
+                canvasViewModel.selectShapesInArea(x, y, width, height);
+            }
+            setState(idleState);
+        }
+    }
+
+    private class MovingState implements CanvasState {
+        @Override
+        public void onMousePressed(MouseEvent e) {
+            lastX = e.getX();
+            lastY = e.getY();
+        }
+
+        @Override
+        public void onMouseDragged(MouseEvent e) {
+            double curX = e.getX(), curY = e.getY();
+            double dx = curX - lastX;
+            double dy = curY - lastY;
+            canvasViewModel.moveSelectedShapes(dx, dy);
+            lastX = curX;
+            lastY = curY;
+        }
+
+        @Override
+        public void onMouseReleased(MouseEvent e) {
+            setState(idleState);
+        }
     }
 
 }
