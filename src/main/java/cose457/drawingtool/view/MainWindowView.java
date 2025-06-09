@@ -54,6 +54,7 @@ public class MainWindowView {
 
     private double startX, startY;
     private double lastX, lastY;
+    private double totalDx, totalDy;
 
     private final CanvasState idleState = new IdleState();
     private final CanvasState drawingState = new DrawingState();
@@ -379,6 +380,8 @@ public class MainWindowView {
         public void onMousePressed(MouseEvent e) {
             lastX = e.getX();
             lastY = e.getY();
+            totalDx = 0;
+            totalDy = 0;
         }
 
         @Override
@@ -386,13 +389,17 @@ public class MainWindowView {
             double curX = e.getX(), curY = e.getY();
             double dx = curX - lastX;
             double dy = curY - lastY;
-            canvasViewModel.moveSelectedShapes(dx, dy);
+            canvasViewModel.translateSelectedShapes(dx, dy);
+            totalDx += dx;
+            totalDy += dy;
             lastX = curX;
             lastY = curY;
         }
 
         @Override
         public void onMouseReleased(MouseEvent e) {
+            canvasViewModel.translateSelectedShapes(-totalDx, -totalDy);
+            canvasViewModel.moveSelectedShapes(totalDx, totalDy);
             setState(idleState);
         }
     }

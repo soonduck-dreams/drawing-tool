@@ -4,6 +4,7 @@ import cose457.drawingtool.command.AddShapeCommand;
 import cose457.drawingtool.command.Command;
 import cose457.drawingtool.command.SelectShapeCommand;
 import cose457.drawingtool.command.MoveSelectedShapesCommand;
+import cose457.drawingtool.command.TranslateSelectedShapesCommand;
 import cose457.drawingtool.command.SelectShapesInAreaCommand;
 import cose457.drawingtool.command.ChangeZOrderCommand;
 import cose457.drawingtool.command.SetSelectedShapesBoundsCommand;
@@ -92,6 +93,15 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
     public void moveSelectedShapes(double dx, double dy) {
         Command command = new MoveSelectedShapesCommand(this, dx, dy);
         executeCommand(command);
+    }
+
+    /**
+     * Move selected shapes directly without recording history.
+     * This is used for drag previews before the actual command is issued.
+     */
+    public void translateSelectedShapes(double dx, double dy) {
+        Command command = new TranslateSelectedShapesCommand(this, dx, dy);
+        command.execute();
     }
 
 
