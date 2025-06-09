@@ -2,6 +2,7 @@ package cose457.drawingtool.viewmodel;
 
 import cose457.drawingtool.command.AddShapeCommand;
 import cose457.drawingtool.command.Command;
+import cose457.drawingtool.command.CommandManager;
 import cose457.drawingtool.command.SelectShapeCommand;
 import cose457.drawingtool.command.MoveSelectedShapesCommand;
 import cose457.drawingtool.command.TranslateSelectedShapesCommand;
@@ -23,9 +24,7 @@ import cose457.drawingtool.util.Observable;
 import lombok.Getter;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -37,8 +36,7 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
     private final List<ShapeViewModel> shapeViewModels = new ArrayList<>();
     private final List<Consumer<List<ShapeViewModel>>> listeners = new ArrayList<>();
 
-    private final Deque<Command> undoStack = new ArrayDeque<>();
-    private final Deque<Command> redoStack = new ArrayDeque<>();
+    private final CommandManager commandManager = new CommandManager();
 
     private final ShapeViewModelFactory shapeViewModelFactory = new ShapeViewModelFactory();
 
@@ -50,26 +48,16 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
         });
     }
 
-    public void executeCommand(Command command) {
-        command.execute();
-        undoStack.push(command);
-        redoStack.clear();
+    private void executeCommand(Command command) {
+        commandManager.execute(command);
     }
 
     public void undo() {
-        if (!undoStack.isEmpty()) {
-            Command cmd = undoStack.pop();
-            cmd.undo();
-            redoStack.push(cmd);
-        }
+        commandManager.undo();
     }
 
     public void redo() {
-        if (!redoStack.isEmpty()) {
-            Command cmd = redoStack.pop();
-            cmd.execute();
-            undoStack.push(cmd);
-        }
+        commandManager.redo();
     }
 
     public void clearSelection() {
