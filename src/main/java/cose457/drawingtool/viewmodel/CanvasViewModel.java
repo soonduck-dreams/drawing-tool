@@ -8,7 +8,9 @@ import cose457.drawingtool.command.SelectShapesInAreaCommand;
 import cose457.drawingtool.command.ChangeZOrderCommand;
 import cose457.drawingtool.command.SetSelectedShapesBoundsCommand;
 import cose457.drawingtool.command.SetTextCommand;
+import cose457.drawingtool.command.SetImagePathCommand;
 import cose457.drawingtool.viewmodel.TextViewModel;
+import cose457.drawingtool.viewmodel.ImageViewModel;
 import cose457.drawingtool.command.SetSelectedShapesFillColorCommand;
 import cose457.drawingtool.command.DeleteShapesCommand;
 import cose457.drawingtool.factory.ShapeModelFactory;
@@ -125,6 +127,14 @@ public class CanvasViewModel implements Observable<List<ShapeViewModel>> {
      */
     public void setText(TextViewModel viewModel, String newText) {
         Command command = new SetTextCommand(this, viewModel, newText);
+        executeCommand(command);
+    }
+
+    /**
+     * Update the image path of the given ImageViewModel via a command.
+     */
+    public void setImagePath(ImageViewModel viewModel, String newPath) {
+        Command command = new SetImagePathCommand(this, viewModel, newPath);
         executeCommand(command);
     }
 

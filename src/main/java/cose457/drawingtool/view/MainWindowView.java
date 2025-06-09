@@ -5,6 +5,7 @@ import cose457.drawingtool.util.ShapeRenderer;
 import cose457.drawingtool.viewmodel.CanvasViewModel;
 import cose457.drawingtool.viewmodel.ShapeViewModel;
 import cose457.drawingtool.viewmodel.TextViewModel;
+import cose457.drawingtool.viewmodel.ImageViewModel;
 import cose457.drawingtool.view.state.CanvasState;
 import javafx.scene.input.MouseEvent;
 import javafx.fxml.FXML;
@@ -20,6 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ColorPicker;
+import javafx.stage.FileChooser;
 import javafx.scene.paint.Color;
 
 import java.util.Arrays;
@@ -145,12 +147,18 @@ public class MainWindowView {
       
         Color initialColor = selected.get(0).getFillColor();
         addColorField(initialColor);
-      
+
         if (selected.size() == 1 && selected.get(0) instanceof TextViewModel tvm) {
             String currentText = tvm.getText() == null ? "" : tvm.getText();
             addStringField("Text", currentText, t -> {
                 canvasViewModel.setText(tvm, t);
             });
+        }
+
+        if (selected.size() == 1 && selected.get(0) instanceof ImageViewModel ivm) {
+            String path = ivm.getImagePath();
+            path = path == null ? "" : path;
+            addPathField(path, p -> canvasViewModel.setImagePath(ivm, p));
         }
     }
 
@@ -189,6 +197,29 @@ public class MainWindowView {
         field.setOnAction(e -> commit.run());
         field.focusedProperty().addListener((obs, o, n) -> { if (!n) commit.run(); });
         row.getChildren().addAll(label, field);
+        propertyPanel.getChildren().add(row);
+        return row;
+    }
+
+    private HBox addPathField(String value, Consumer<String> updater) {
+        HBox row = new HBox(5);
+        row.setAlignment(Pos.CENTER_LEFT);
+        Label label = new Label("Path:");
+        TextField field = new TextField(value);
+        field.setPrefWidth(100);
+        Button browse = new Button("...");
+        Runnable commit = () -> updater.accept(field.getText());
+        field.setOnAction(e -> commit.run());
+        field.focusedProperty().addListener((obs, o, n) -> { if (!n) commit.run(); });
+        browse.setOnAction(e -> {
+            FileChooser chooser = new FileChooser();
+            java.io.File file = chooser.showOpenDialog(drawCanvas.getScene().getWindow());
+            if (file != null) {
+                field.setText(file.getAbsolutePath());
+                updater.accept(file.getAbsolutePath());
+            }
+        });
+        row.getChildren().addAll(label, field, browse);
         propertyPanel.getChildren().add(row);
         return row;
     }
